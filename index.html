@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100a15">
+  <meta name="description" content="Une petite invitation préparée avec le cœur.">
+  <title>Une petite invitation ❤️</title>
+  <style>
+    /* Palette et dimensions principales : faciles à personnaliser. */
+    :root {
+      color-scheme: dark;
+      --night: #100a15;
+      --plum: #241027;
+      --pink: #f184b3;
+      --rose: #ffb0cf;
+      --lavender: #c6a4e8;
+      --text: #fff7fb;
+      --muted: #c5b5c9;
+      --line: rgba(255, 226, 243, .16);
+      --glass: rgba(25, 15, 30, .78);
+      --ease: cubic-bezier(.2, .8, .2, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 320px;
+      min-height: 100%;
+      background: var(--night);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(ellipse at 50% 2%, rgba(119, 55, 129, .36), transparent 42rem),
+        radial-gradient(ellipse at 0% 80%, rgba(104, 31, 82, .26), transparent 33rem),
+        radial-gradient(ellipse at 100% 72%, rgba(58, 35, 105, .24), transparent 34rem),
+        linear-gradient(145deg, #100a15 6%, #160d1b 48%, #0d0a15 100%);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .scene {
+      position: fixed;
+      z-index: 0;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .scene::before,
+    .scene::after {
+      position: absolute;
+      content: "";
+      border: 1px solid rgba(255, 207, 232, .055);
+      border-radius: 50%;
+      transform: rotate(-28deg);
+    }
+
+    .scene::before {
+      width: min(74vw, 790px);
+      height: min(34vw, 360px);
+      top: 17%;
+      left: 50%;
+      box-shadow: 0 0 90px rgba(190, 91, 167, .06), inset 0 0 90px rgba(190, 91, 167, .035);
+      translate: -50% 0;
+    }
+
+    .scene::after {
+      width: min(90vw, 1060px);
+      height: min(43vw, 500px);
+      top: 13%;
+      left: 50%;
+      border-color: rgba(199, 158, 239, .04);
+      translate: -50% 0;
+    }
+
+    .star {
+      position: absolute;
+      top: var(--top);
+      left: var(--left);
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      background: #ffe9f5;
+      opacity: .62;
+      box-shadow: 0 0 10px 2px rgba(255, 220, 240, .48);
+      animation: twinkle var(--duration) ease-in-out var(--delay) infinite alternate;
+    }
+
+    .ambient-heart {
+      position: absolute;
+      left: var(--left);
+      bottom: -36px;
+      color: rgba(255, 156, 202, .22);
+      font-size: var(--size);
+      animation: float-up var(--duration) linear var(--delay) infinite;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      width: min(100% - 40px, 1040px);
+      margin-inline: auto;
+    }
+
+    .topbar {
+      display: flex;
+      min-height: 88px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: #f8eaf2;
+      font-size: .72rem;
+      font-weight: 650;
+      letter-spacing: .17em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .wordmark-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid rgba(255, 189, 220, .32);
+      border-radius: 50%;
+      color: var(--rose);
+      box-shadow: 0 0 24px rgba(239, 111, 176, .14);
+    }
+
+    .wordmark-mark svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .restart {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: #d6c7d9;
+      background: transparent;
+      cursor: pointer;
+      font-size: .82rem;
+      transition: color .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .restart:hover {
+      border-color: var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .restart svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .stage {
+      display: grid;
+      flex: 1;
+      place-items: center;
+      padding: 28px 0 50px;
+    }
+
+    .screen {
+      position: relative;
+      width: min(100%, 710px);
+      padding: clamp(28px, 6vw, 66px);
+      overflow: hidden;
+      border: 1px solid rgba(255, 221, 239, .16);
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, .055), transparent 34%),
+        var(--glass);
+      box-shadow:
+        0 32px 100px rgba(0, 0, 0, .4),
+        0 0 70px rgba(168, 76, 147, .11),
+        inset 0 1px 0 rgba(255, 255, 255, .07);
+      text-align: center;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .screen::before {
+      position: absolute;
+      top: -130px;
+      left: 50%;
+      width: 280px;
+      height: 210px;
+      border-radius: 50%;
+      background: rgba(193, 91, 162, .15);
+      content: "";
+      filter: blur(65px);
+      pointer-events: none;
+      translate: -50% 0;
+    }
+
+    .screen[hidden] {
+      display: none;
+    }
+
+    .screen.is-entering {
+      animation: card-in .68s var(--ease) both;
+    }
+
+    .screen-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 24px;
+      color: #e9a9ca;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      width: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(244, 174, 211, .8));
+      content: "";
+    }
+
+    .eyebrow::after {
+      transform: rotate(180deg);
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 18px;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-size: clamp(2.5rem, 7vw, 4.75rem);
+      font-weight: 500;
+      letter-spacing: -.055em;
+      line-height: 1.06;
+      text-wrap: balance;
+    }
+
+    h1 em {
+      color: var(--rose);
+      font-weight: 500;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 500;
+      letter-spacing: -.035em;
+      line-height: 1.1;
+      text-wrap: balance;
+    }
+
+    .intro-copy,
+    .body-copy {
+      max-width: 510px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: clamp(.98rem, 2vw, 1.08rem);
+      line-height: 1.8;
+      text-wrap: pretty;
+    }
+
+    .intro-copy {
+      margin-bottom: 32px;
+    }
+
+    .ornament {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 27px;
+      place-items: center;
+      border: 1px solid rgba(255, 193, 222, .24);
+      border-radius: 50%;
+      color: var(--rose);
+      background: radial-gradient(circle, rgba(241, 132, 179, .15), rgba(241, 132, 179, .025) 70%);
+      box-shadow: 0 0 35px rgba(240, 113, 179, .15);
+    }
+
+    .ornament svg {
+      width: 23px;
+      height: 23px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 23px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: .94rem;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
+      text-decoration: none;
+      transition:
+        transform .2s var(--ease),
+        box-shadow .2s ease,
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button:active {
+      transform: translateY(0) scale(.985);
+    }
+
+    .button:focus-visible,
+    .restart:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(255, 176, 207, .75);
+      outline-offset: 3px;
+    }
+
+    .button-primary {
+      color: #2a1021;
+      background: linear-gradient(115deg, #ffbed9, #ed8fbd 55%, #d79be8);
+      box-shadow: 0 10px 28px rgba(216, 100, 166, .24), inset 0 1px 0 rgba(255, 255, 255, .58);
+    }
+
+    .button-primary:hover {
+      box-shadow: 0 14px 36px rgba(216, 100, 166, .36), inset 0 1px 0 rgba(255, 255, 255, .7);
+    }
+
+    .button-secondary {
+      border-color: rgba(255, 224, 240, .18);
+      color: #f6e9f0;
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .button-secondary:hover {
+      border-color: rgba(255, 224, 240, .34);
+      background: rgba(255, 255, 255, .085);
+    }
+
+    .button svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+    }
+
+    .quiet-note {
+      margin: 20px 0 0;
+      color: #ab99af;
+      font-size: .8rem;
+      line-height: 1.6;
+    }
+
+    .question-copy {
+      margin: 0 auto 22px;
+      animation: text-in .65s .12s both;
+    }
+
+    .question-copy p {
+      margin: 0;
+      color: #d5c7d8;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.8;
+      text-wrap: pretty;
+    }
+
+    .question-title {
+      margin: 22px 0 30px;
+      color: #fff4fb;
+      animation: text-in .68s .28s both;
+    }
+
+    .question-title span {
+      color: var(--rose);
+    }
+
+    .success-message {
+      margin-bottom: 28px;
+      animation: text-in .58s both;
+    }
+
+    .success-message h1 {
+      margin-bottom: 14px;
+      font-size: clamp(2.1rem, 6vw, 3.8rem);
+    }
+
+    .success-message p {
+      max-width: 490px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .form-heading {
+      margin: 0 0 21px;
+      color: #f3d9e8;
+      font-size: .74rem;
+      font-weight: 750;
+      letter-spacing: .15em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .date-form {
+      text-align: left;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 17px 14px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field--wide {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 8px;
+      color: #f3e4ed;
+      font-size: .84rem;
+      font-weight: 650;
+    }
+
+    .optional {
+      color: #ad9aac;
+      font-size: .77rem;
+      font-weight: 450;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      display: block;
+      width: 100%;
+      min-height: 49px;
+      padding: 12px 14px;
+      border: 1px solid rgba(246, 217, 235, .17);
+      border-radius: 13px;
+      color: var(--text);
+      background: rgba(9, 7, 13, .42);
+      transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .field input:hover,
+    .field select:hover,
+    .field textarea:hover {
+      border-color: rgba(246, 183, 216, .36);
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: rgba(244, 157, 199, .72);
+      background: rgba(9, 7, 13, .68);
+      box-shadow: 0 0 0 4px rgba(240, 122, 179, .1);
+      outline: none;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #897b8c;
+    }
+
+    .field select {
+      color-scheme: dark;
+      cursor: pointer;
+    }
+
+    .field textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .field input[type="date"],
+    .field input[type="time"] {
+      color-scheme: dark;
+    }
+
+    .form-foot {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .privacy-note {
+      margin: 0;
+      color: #a998ad;
+      font-size: .75rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .refusal-mark {
+      display: grid;
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 23px;
+      place-items: center;
+      border: 1px solid rgba(225, 181, 216, .21);
+      border-radius: 50%;
+      color: #eeb8d3;
+      background: rgba(219, 124, 176, .07);
+      animation: gentle-pulse 2.8s ease-in-out infinite;
+    }
+
+    .refusal-mark svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .refusal-copy {
+      max-width: 510px;
+      margin: 0 auto 28px;
+      color: #d2c2d5;
+      font-size: 1.02rem;
+      line-height: 1.8;
+      text-wrap: pretty;
+    }
+
+    .summary-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 27px 0;
+      text-align: left;
+    }
+
+    .summary-item {
+      min-width: 0;
+      padding: 14px 15px;
+      border: 1px solid rgba(255, 225, 241, .12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .summary-item--wide {
+      grid-column: 1 / -1;
+    }
+
+    .summary-item dt {
+      margin-bottom: 6px;
+      color: #dca5c4;
+      font-size: .7rem;
+      font-weight: 750;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .summary-item dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+      color: #fff5fa;
+      font-size: .95rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .summary-message {
+      margin: 0 0 26px;
+      color: #e0ccdc;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-size: clamp(1.35rem, 3vw, 1.8rem);
+      line-height: 1.45;
+      text-wrap: balance;
+    }
+
+    .contact-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 25px 0 15px;
+    }
+
+    .contact-actions .button {
+      width: 100%;
+      min-height: 58px;
+      padding-inline: 16px;
+    }
+
+    .button-whatsapp {
+      color: #07170f;
+      background: linear-gradient(120deg, #a9f4c5, #5edc91);
+      box-shadow: 0 10px 28px rgba(64, 210, 123, .18), inset 0 1px 0 rgba(255, 255, 255, .65);
+    }
+
+    .button-whatsapp:hover {
+      box-shadow: 0 14px 34px rgba(64, 210, 123, .29), inset 0 1px 0 rgba(255, 255, 255, .75);
+    }
+
+    .button-messenger {
+      color: #fff;
+      background: linear-gradient(120deg, #a7c6ff, #647ff1 58%, #9268e8);
+      box-shadow: 0 10px 28px rgba(103, 132, 242, .2), inset 0 1px 0 rgba(255, 255, 255, .35);
+    }
+
+    .button-messenger:hover {
+      box-shadow: 0 14px 34px rgba(103, 132, 242, .32), inset 0 1px 0 rgba(255, 255, 255, .45);
+    }
+
+    .messenger-help {
+      max-width: 540px;
+      margin: 0 auto 14px;
+      padding: 13px 15px;
+      border: 1px solid rgba(169, 191, 255, .2);
+      border-radius: 13px;
+      color: #d9e2ff;
+      background: rgba(106, 129, 232, .08);
+      font-size: .84rem;
+      line-height: 1.65;
+      text-align: left;
+    }
+
+    .copy-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .copy-fallback {
+      margin: 14px 0;
+      text-align: left;
+    }
+
+    .copy-fallback label {
+      display: block;
+      margin-bottom: 8px;
+      color: #f3e4ed;
+      font-size: .84rem;
+      font-weight: 650;
+    }
+
+    .copy-fallback textarea {
+      display: block;
+      width: 100%;
+      min-height: 150px;
+      padding: 12px 14px;
+      border: 1px solid rgba(246, 217, 235, .2);
+      border-radius: 13px;
+      color: var(--text);
+      background: rgba(9, 7, 13, .55);
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    .copy-fallback button {
+      margin-top: 10px;
+    }
+
+    .contact-status {
+      min-height: 1.5em;
+      margin: 0 0 18px;
+      color: #d8c9dc;
+      font-size: .84rem;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .footer {
+      padding: 0 0 25px;
+      color: rgba(210, 191, 215, .56);
+      font-size: .72rem;
+      letter-spacing: .06em;
+      text-align: center;
+    }
+
+    .burst-layer {
+      position: fixed;
+      z-index: 5;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .burst-heart {
+      position: absolute;
+      bottom: -35px;
+      left: var(--left);
+      color: var(--color);
+      font-size: var(--size);
+      line-height: 1;
+      opacity: 0;
+      text-shadow: 0 0 18px currentColor;
+      animation: heart-burst var(--duration) var(--ease) var(--delay) forwards;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+      clip-path: inset(50%);
+    }
+
+    @keyframes twinkle {
+      from { opacity: .25; transform: scale(.72); }
+      to { opacity: .9; transform: scale(1.25); }
+    }
+
+    @keyframes float-up {
+      0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(-10deg); }
+      12% { opacity: 1; }
+      82% { opacity: .72; }
+      100% { opacity: 0; transform: translate3d(28px, -110vh, 0) rotate(18deg); }
+    }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(16px) scale(.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes text-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes heart-burst {
+      0% { opacity: 0; transform: translate3d(0, 0, 0) scale(.55) rotate(-14deg); }
+      12% { opacity: .92; }
+      100% { opacity: 0; transform: translate3d(var(--drift), -105vh, 0) scale(1.18) rotate(22deg); }
+    }
+
+    @keyframes gentle-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(238, 184, 211, .02); }
+      50% { box-shadow: 0 0 0 11px rgba(238, 184, 211, .035); }
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        width: min(100% - 28px, 540px);
+      }
+
+      .topbar {
+        min-height: 72px;
+      }
+
+      .wordmark {
+        gap: 8px;
+        font-size: .62rem;
+        letter-spacing: .13em;
+      }
+
+      .wordmark-mark {
+        width: 31px;
+        height: 31px;
+      }
+
+      .restart {
+        gap: 6px;
+        padding-inline: 9px;
+        font-size: .77rem;
+      }
+
+      .stage {
+        padding: 18px 0 34px;
+      }
+
+      .screen {
+        padding: 36px 23px;
+        border-radius: 23px;
+      }
+
+      .eyebrow {
+        margin-bottom: 21px;
+        font-size: .62rem;
+        letter-spacing: .14em;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .field--wide {
+        grid-column: auto;
+      }
+
+      .summary-list {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-item--wide {
+        grid-column: auto;
+      }
+
+      .contact-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+
+      .button-row .button {
+        width: 100%;
+      }
+
+      .footer {
+        padding-bottom: 18px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .page {
+        width: min(100% - 20px, 540px);
+      }
+
+      .screen {
+        padding: 32px 18px;
+      }
+
+      h1 {
+        font-size: 2.45rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+
+      .scene .star,
+      .scene .ambient-heart {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Décor purement visuel : aucun contenu ni donnée personnelle. -->
+  <div class="scene" aria-hidden="true">
+    <span class="star" style="--top: 12%; --left: 17%; --size: 2px; --duration: 2.8s; --delay: -.7s"></span>
+    <span class="star" style="--top: 20%; --left: 78%; --size: 3px; --duration: 3.5s; --delay: -1.4s"></span>
+    <span class="star" style="--top: 42%; --left: 8%; --size: 2px; --duration: 2.4s; --delay: -.3s"></span>
+    <span class="star" style="--top: 67%; --left: 88%; --size: 2px; --duration: 3.1s; --delay: -1.8s"></span>
+    <span class="star" style="--top: 81%; --left: 23%; --size: 3px; --duration: 3.8s; --delay: -.9s"></span>
+    <span class="star" style="--top: 31%; --left: 93%; --size: 2px; --duration: 2.6s; --delay: -1.1s"></span>
+    <span class="star" style="--top: 75%; --left: 66%; --size: 2px; --duration: 3.2s; --delay: -.4s"></span>
+    <span class="ambient-heart" style="--left: 14%; --size: 15px; --duration: 19s; --delay: -12s">♡</span>
+    <span class="ambient-heart" style="--left: 83%; --size: 19px; --duration: 23s; --delay: -7s">♡</span>
+    <span class="ambient-heart" style="--left: 61%; --size: 12px; --duration: 21s; --delay: -16s">♡</span>
+  </div>
+
+  <div class="burst-layer" id="burst-layer" aria-hidden="true"></div>
+  <p class="sr-only" id="screen-announcement" role="status" aria-live="polite"></p>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="wordmark" href="#" aria-label="Une petite invitation — accueil" id="home-link">
+        <span class="wordmark-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M20.4 5.7a5 5 0 0 0-7.1 0L12 7l-1.3-1.3a5 5 0 0 0-7.1 7.1l1.3 1.3L12 21l7.1-6.9 1.3-1.3a5 5 0 0 0 0-7.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>Une petite invitation</span>
+      </a>
+      <button class="restart" type="button" id="restart-button" aria-label="Recommencer l'expérience">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20 7v5h-5M4.8 9a7.5 7.5 0 0 1 12.7-2L20 9M4 17v-5h5m10.2 3a7.5 7.5 0 0 1-12.7 2L4 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Recommencer
+      </button>
+    </header>
+
+    <main class="stage" id="main-content">
+      <!-- Écran 1 : l'accroche -->
+      <section class="screen is-entering" id="welcome-screen" aria-labelledby="welcome-title">
+        <div class="screen-content">
+          <div class="ornament" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M20.4 5.7a5 5 0 0 0-7.1 0L12 7l-1.3-1.3a5 5 0 0 0-7.1 7.1l1.3 1.3L12 21l7.1-6.9 1.3-1.3a5 5 0 0 0 0-7.1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="eyebrow">Un petit mot, juste pour toi</p>
+          <h1 id="welcome-title" tabindex="-1">Hey, toi ! 👀❤️<br>J'ai une petite question à te poser…</h1>
+          <p class="intro-copy">Rien de compliqué. Juste une petite surprise préparée avec le sourire.</p>
+          <button class="button button-primary" type="button" id="open-question">
+            Clique ici si tu es curieuse 😏
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <p class="quiet-note">À ton rythme — et sans aucune pression. ♡</p>
+        </div>
+      </section>
+
+      <!-- Écran 2 : la question, avec une réponse positive et une réponse libre. -->
+      <section class="screen" id="question-screen" aria-labelledby="question-title" aria-hidden="true" hidden>
+        <div class="screen-content">
+          <p class="eyebrow">Alors, voilà…</p>
+          <div class="question-copy">
+            <p>Bon, je vais être honnête avec toi… J'aimerais bien passer un moment avec toi, apprendre à mieux te connaître et créer quelques beaux souvenirs. Alors, j'ai une question…</p>
+          </div>
+          <h2 class="question-title" id="question-title" tabindex="-1">Ça te dirait qu'on se fasse un date ? <span>🌹❤️</span></h2>
+          <div class="button-row">
+            <button class="button button-primary" type="button" id="accept-button">OUI, avec plaisir 😍</button>
+            <button class="button button-secondary" type="button" id="decline-button">Pas cette fois 🙈</button>
+          </div>
+          <p class="quiet-note">Quelle que soit ta réponse, elle sera respectée. ♡</p>
+        </div>
+      </section>
+
+      <!-- Écran 3 : la célébration et le formulaire local. -->
+      <section class="screen" id="accepted-screen" aria-labelledby="accepted-title" aria-hidden="true" hidden>
+        <div class="screen-content">
+          <div class="success-message">
+            <p class="eyebrow">Petit moment de joie</p>
+            <h1 id="accepted-title" tabindex="-1">ATTENDS… T'AS DIT OUI ?! 😭❤️</h1>
+            <p>Bon, je vois que tu as du goût ! 😂<br>À toi de choisir ce qui te ferait plaisir.</p>
+          </div>
+
+          <form class="date-form" id="date-form" autocomplete="off" novalidate>
+            <p class="form-heading">À quoi ressemble ton date idéal ?</p>
+            <div class="form-grid">
+              <div class="field">
+                <label for="date-choice">La date</label>
+                <input id="date-choice" name="date" type="date" required>
+              </div>
+              <div class="field">
+                <label for="time-choice">L'heure préférée</label>
+                <input id="time-choice" name="time" type="time" required>
+              </div>
+              <div class="field field--wide">
+                <label for="place-choice">Le lieu</label>
+                <select id="place-choice" name="place" required>
+                  <option value="" selected disabled>Choisis un lieu…</option>
+                  <option value="Café">Café</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Cinéma">Cinéma</option>
+                  <option value="Parc">Parc</option>
+                  <option value="Balade">Balade</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+              <div class="field field--wide" id="other-place-wrap" hidden>
+                <label for="other-place">Quel lieu avais-tu en tête ?</label>
+                <input id="other-place" name="otherPlace" type="text" placeholder="Un endroit qui te ferait plaisir…" maxlength="100" disabled>
+              </div>
+              <div class="field field--wide">
+                <label for="activity-choice">L'activité</label>
+                <select id="activity-choice" name="activity" required>
+                  <option value="" selected disabled>Choisis une activité…</option>
+                  <option value="Prendre une glace">Prendre une glace</option>
+                  <option value="Aller au restaurant">Aller au restaurant</option>
+                  <option value="Regarder un film">Regarder un film</option>
+                  <option value="Se promener et discuter">Se promener et discuter</option>
+                  <option value="Faire une balade">Faire une balade</option>
+                  <option value="Autre activité">Autre activité</option>
+                </select>
+              </div>
+              <div class="field field--wide" id="other-activity-wrap" hidden>
+                <label for="other-activity">Tu as une autre idée ?</label>
+                <input id="other-activity" name="otherActivity" type="text" placeholder="Dis-moi ce qui te ferait envie…" maxlength="80" disabled>
+              </div>
+              <div class="field field--wide">
+                <label for="little-message">Un petit mot <span class="optional">(facultatif)</span></label>
+                <textarea id="little-message" name="message" maxlength="280" placeholder="Une envie, une précision, ou juste un petit coucou…"></textarea>
+              </div>
+            </div>
+            <div class="form-foot">
+              <button class="button button-primary" type="submit">
+                Confirmer notre date ❤️
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="m5 12 4.2 4.2L19 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <p class="privacy-note">Tes choix restent dans cette page. Rien n'est envoyé avant que tu choisisses une application.</p>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Écran 4 : un refus accueilli avec douceur, sans insistance. -->
+      <section class="screen" id="declined-screen" aria-labelledby="declined-title" aria-hidden="true" hidden>
+        <div class="screen-content">
+          <div class="refusal-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 3.5c1.1 2.1 2.2 3.3 4.3 4.4-2.1 1.1-3.2 2.2-4.3 4.3-1.1-2.1-2.2-3.2-4.3-4.3 2.1-1.1 3.2-2.3 4.3-4.4ZM18.5 14c.6 1.2 1.3 1.8 2.5 2.5-1.2.6-1.9 1.3-2.5 2.5-.6-1.2-1.3-1.9-2.5-2.5 1.2-.7 1.9-1.3 2.5-2.5ZM5 14c.5.9 1.1 1.5 2 2-.9.5-1.5 1.1-2 2-.5-.9-1.1-1.5-2-2 .9-.5 1.5-1.1 2-2Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="eyebrow">Merci de me l'avoir dit</p>
+          <h2 id="declined-title" tabindex="-1">Pas de souci, t'inquiète ! 😊❤️</h2>
+          <p class="refusal-copy">Au moins, j'aurai eu le courage de tenter ma chance. Merci d'avoir pris le temps de répondre — prends soin de toi !</p>
+          <button class="button button-secondary" type="button" id="return-home">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m14.5 5-7 7 7 7M8 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Retour à l'accueil
+          </button>
+        </div>
+      </section>
+
+      <!-- Écran 5 : le récapitulatif du programme choisi. -->
+      <section class="screen" id="summary-screen" aria-labelledby="summary-title" aria-hidden="true" hidden>
+        <div class="screen-content">
+          <p class="eyebrow">Notre petit programme</p>
+          <h1 id="summary-title" tabindex="-1">C'est noté ! <em>✨</em></h1>
+          <dl class="summary-list">
+            <div class="summary-item">
+              <dt>📅 Date</dt>
+              <dd id="summary-date"></dd>
+            </div>
+            <div class="summary-item">
+              <dt>⏰ Heure</dt>
+              <dd id="summary-time"></dd>
+            </div>
+            <div class="summary-item">
+              <dt>📍 Lieu</dt>
+              <dd id="summary-place"></dd>
+            </div>
+            <div class="summary-item">
+              <dt>✨ Activité</dt>
+              <dd id="summary-activity"></dd>
+            </div>
+            <div class="summary-item summary-item--wide" id="summary-message-item" hidden>
+              <dt>💌 Ton petit mot</dt>
+              <dd id="summary-message"></dd>
+            </div>
+          </dl>
+          <p class="summary-message">Awww, notre petit programme prend forme ! 😍❤️ Maintenant, il ne reste plus qu'à me transmettre les détails.</p>
+          <div class="contact-actions" aria-label="Choisir comment transmettre les détails">
+            <a class="button button-whatsapp" id="whatsapp-link" href="#" target="_blank" rel="noopener noreferrer">
+              M'envoyer les détails sur WhatsApp 💚
+            </a>
+            <a class="button button-messenger" id="messenger-link" href="#" target="_blank" rel="noopener noreferrer">
+              M'envoyer les détails sur Messenger 💙
+            </a>
+          </div>
+          <p class="privacy-note">WhatsApp ouvrira un message prérempli. Relis-le puis appuie sur Envoyer pour le transmettre.</p>
+
+          <div id="messenger-followup" hidden>
+            <p class="messenger-help" id="messenger-help">
+              Le profil Facebook s'ouvre dans un nouvel onglet. Pour m'écrire, choisis « Message » ou « Envoyer un message » sur le profil. Si cette option n'apparaît pas, elle peut dépendre des réglages de Facebook.
+            </p>
+            <div class="copy-actions">
+              <button class="button button-secondary" type="button" id="copy-message">
+                Copier le message 💌
+              </button>
+            </div>
+          </div>
+
+          <div class="copy-fallback" id="copy-fallback" hidden>
+            <label for="manual-message">Copie manuellement le message ci-dessous :</label>
+            <textarea id="manual-message" rows="7" readonly></textarea>
+            <button class="button button-secondary" type="button" id="select-manual-message">Sélectionner le message</button>
+          </div>
+          <p class="contact-status" id="contact-status" role="status" aria-live="polite"></p>
+          <p class="privacy-note">Aucun message ne part automatiquement. Le récapitulatif reste dans cette page jusqu'à sa fermeture ou au redémarrage.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">Fait avec un peu de courage et beaucoup de cœur ♡</footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      // À personnaliser : les liens ne sont ouverts qu'après une action explicite.
+      const whatsappNumber = "261323818029";
+      const messengerProfileUrl = "https://www.facebook.com/profile.php?id=100085084740548";
+
+      const screens = Array.from(document.querySelectorAll(".screen"));
+      const form = document.getElementById("date-form");
+      const dateInput = document.getElementById("date-choice");
+      const timeInput = document.getElementById("time-choice");
+      const placeInput = document.getElementById("place-choice");
+      const otherPlaceWrap = document.getElementById("other-place-wrap");
+      const otherPlaceInput = document.getElementById("other-place");
+      const activitySelect = document.getElementById("activity-choice");
+      const otherActivityWrap = document.getElementById("other-activity-wrap");
+      const otherActivityInput = document.getElementById("other-activity");
+      const burstLayer = document.getElementById("burst-layer");
+      const announcement = document.getElementById("screen-announcement");
+      const whatsappLink = document.getElementById("whatsapp-link");
+      const messengerLink = document.getElementById("messenger-link");
+      const messengerFollowup = document.getElementById("messenger-followup");
+      const copyFallback = document.getElementById("copy-fallback");
+      const manualMessage = document.getElementById("manual-message");
+      const contactStatus = document.getElementById("contact-status");
+      let currentDateDetails = null;
+      let currentMessage = "";
+
+      function localDateString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function firstAllowedDate() {
+        const tomorrow = new Date();
+        tomorrow.setHours(0, 0, 0, 0);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow;
+      }
+
+      function updateDateMinimum() {
+        // La date doit être strictement future : aujourd'hui n'est pas sélectionnable.
+        dateInput.min = localDateString(firstAllowedDate());
+      }
+
+      function showScreen(id) {
+        const next = document.getElementById(id);
+        if (!next) return;
+
+        screens.forEach((screen) => {
+          const active = screen === next;
+          screen.hidden = !active;
+          screen.setAttribute("aria-hidden", String(!active));
+          screen.classList.remove("is-entering");
+        });
+
+        // Relance l'animation même si on revient sur le même écran.
+        void next.offsetWidth;
+        next.classList.add("is-entering");
+        announcement.textContent = next.querySelector("h1, h2")?.textContent.trim() || "";
+
+        const heading = next.querySelector("h1, h2");
+        if (heading) {
+          window.requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+        }
+      }
+
+      function makeHeartBurst() {
+        const colors = ["#ff9dc7", "#ffd0e4", "#d7a9f1", "#f27eae"];
+        for (let index = 0; index < 24; index += 1) {
+          const heart = document.createElement("span");
+          heart.className = "burst-heart";
+          heart.textContent = index % 4 === 0 ? "♡" : "♥";
+          heart.style.setProperty("--left", `${Math.random() * 100}%`);
+          heart.style.setProperty("--size", `${12 + Math.random() * 19}px`);
+          heart.style.setProperty("--duration", `${2.1 + Math.random() * 2.2}s`);
+          heart.style.setProperty("--delay", `${Math.random() * .55}s`);
+          heart.style.setProperty("--drift", `${Math.round(Math.random() * 150 - 75)}px`);
+          heart.style.setProperty("--color", colors[index % colors.length]);
+          burstLayer.appendChild(heart);
+          heart.addEventListener("animationend", () => heart.remove(), { once: true });
+        }
+      }
+
+      function resetConditionalFields() {
+        otherPlaceWrap.hidden = true;
+        otherPlaceInput.disabled = true;
+        otherPlaceInput.required = false;
+        otherActivityWrap.hidden = true;
+        otherActivityInput.disabled = true;
+        otherActivityInput.required = false;
+      }
+
+      function resetExperience() {
+        form.reset();
+        form.querySelectorAll("input, select, textarea").forEach((field) => field.setCustomValidity(""));
+        resetConditionalFields();
+        burstLayer.replaceChildren();
+        currentDateDetails = null;
+        currentMessage = "";
+        whatsappLink.href = "#";
+        messengerLink.href = "#";
+        messengerFollowup.hidden = true;
+        copyFallback.hidden = true;
+        manualMessage.value = "";
+        contactStatus.textContent = "";
+        ["summary-date", "summary-time", "summary-place", "summary-activity", "summary-message"].forEach((id) => {
+          document.getElementById(id).textContent = "";
+        });
+        document.getElementById("summary-message-item").hidden = true;
+        updateDateMinimum();
+        showScreen("welcome-screen");
+      }
+
+      function buildMessage(details) {
+        return [
+          "Coucou ! ❤️ Voici les détails de notre date :",
+          "",
+          `📅 Date : ${details.dateLabel}`,
+          `⏰ Heure : ${details.time}`,
+          `📍 Lieu : ${details.place}`,
+          `✨ Activité : ${details.activity}`,
+          `💌 Mon petit message : ${details.message || "(aucun)"}`,
+          "",
+          "J'ai hâte ! 😍❤️"
+        ].join("\n");
+      }
+
+      function isValidDetails(details) {
+        return Boolean(
+          details &&
+          details.date &&
+          details.time &&
+          details.place &&
+          details.activity &&
+          new Date(`${details.date}T00:00:00`) >= firstAllowedDate()
+        );
+      }
+
+      function renderManualCopyFallback() {
+        copyFallback.hidden = false;
+        manualMessage.value = currentMessage;
+        manualMessage.focus();
+        manualMessage.select();
+
+        try {
+          return document.execCommand("copy");
+        } catch {
+          return false;
+        }
+      }
+
+      async function copyDateMessage() {
+        if (!currentMessage) return;
+        manualMessage.value = currentMessage;
+
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(currentMessage);
+          } else if (!renderManualCopyFallback()) {
+            throw new Error("Copie automatique indisponible");
+          }
+
+          copyFallback.hidden = true;
+          contactStatus.textContent = "Message copié ! ❤️ Colle-le dans notre conversation Messenger et appuie sur Envoyer.";
+        } catch {
+          const copiedWithFallback = renderManualCopyFallback();
+          if (copiedWithFallback) {
+            copyFallback.hidden = true;
+            contactStatus.textContent = "Message copié ! ❤️ Colle-le dans notre conversation Messenger et appuie sur Envoyer.";
+          } else {
+            contactStatus.textContent = "La copie automatique n'a pas fonctionné. Le message est sélectionné ci-dessous : copie-le puis colle-le dans Messenger.";
+          }
+        }
+      }
+
+      document.getElementById("open-question").addEventListener("click", () => {
+        showScreen("question-screen");
+      });
+
+      document.getElementById("accept-button").addEventListener("click", () => {
+        updateDateMinimum();
+        showScreen("accepted-screen");
+        makeHeartBurst();
+      });
+
+      document.getElementById("decline-button").addEventListener("click", () => {
+        showScreen("declined-screen");
+      });
+
+      document.getElementById("return-home").addEventListener("click", resetExperience);
+      document.getElementById("restart-button").addEventListener("click", resetExperience);
+
+      document.getElementById("home-link").addEventListener("click", (event) => {
+        event.preventDefault();
+        resetExperience();
+      });
+
+      placeInput.addEventListener("change", () => {
+        const choosingOther = placeInput.value === "Autre";
+        placeInput.setCustomValidity(placeInput.value ? "" : "Choisis le lieu du rendez-vous.");
+        otherPlaceWrap.hidden = !choosingOther;
+        otherPlaceInput.disabled = !choosingOther;
+        otherPlaceInput.required = choosingOther;
+        otherPlaceInput.setCustomValidity("");
+        if (choosingOther) otherPlaceInput.focus();
+      });
+
+      activitySelect.addEventListener("change", () => {
+        const choosingOther = activitySelect.value === "Autre activité";
+        activitySelect.setCustomValidity(activitySelect.value ? "" : "Choisis une activité.");
+        otherActivityWrap.hidden = !choosingOther;
+        otherActivityInput.disabled = !choosingOther;
+        otherActivityInput.required = choosingOther;
+        otherActivityInput.setCustomValidity("");
+        if (choosingOther) otherActivityInput.focus();
+      });
+
+      otherPlaceInput.addEventListener("input", () => otherPlaceInput.setCustomValidity(""));
+      otherActivityInput.addEventListener("input", () => otherActivityInput.setCustomValidity(""));
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        updateDateMinimum();
+
+        placeInput.setCustomValidity(placeInput.value ? "" : "Choisis le lieu du rendez-vous.");
+        activitySelect.setCustomValidity(activitySelect.value ? "" : "Choisis une activité.");
+        timeInput.setCustomValidity(timeInput.value ? "" : "Choisis une heure.");
+
+        const otherPlace = otherPlaceInput.value.trim();
+        if (placeInput.value === "Autre") {
+          otherPlaceInput.setCustomValidity(otherPlace ? "" : "Précise le lieu qui te ferait plaisir.");
+        } else {
+          otherPlaceInput.setCustomValidity("");
+        }
+
+        const otherActivity = otherActivityInput.value.trim();
+        if (activitySelect.value === "Autre activité") {
+          otherActivityInput.setCustomValidity(otherActivity ? "" : "Précise l'activité qui te tente.");
+        } else {
+          otherActivityInput.setCustomValidity("");
+        }
+
+        const firstDate = firstAllowedDate();
+        const chosenDate = dateInput.value
+          ? new Date(`${dateInput.value}T00:00:00`)
+          : null;
+        if (!chosenDate) {
+          dateInput.setCustomValidity("Choisis une date future.");
+        } else if (chosenDate < firstDate) {
+          dateInput.setCustomValidity("Choisis une date à partir de demain.");
+        } else {
+          dateInput.setCustomValidity("");
+        }
+
+        if (!form.reportValidity()) return;
+
+        const formattedDate = new Intl.DateTimeFormat("fr-FR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }).format(chosenDate);
+        const place = placeInput.value === "Autre"
+          ? `Autre — ${otherPlace}`
+          : placeInput.value;
+        const activity = activitySelect.value === "Autre activité"
+          ? `Autre activité — ${otherActivity}`
+          : activitySelect.value;
+        const time = timeInput.value;
+        const message = document.getElementById("little-message").value.trim();
+        const details = {
+          date: dateInput.value,
+          dateLabel: formattedDate.charAt(0).toLocaleUpperCase("fr-FR") + formattedDate.slice(1),
+          time,
+          place,
+          activity,
+          message
+        };
+
+        // Vérifie les valeurs avant de construire les liens externes.
+        const internationalNumber = whatsappNumber.replace(/\D/g, "");
+        if (!isValidDetails(details) || !/^\d{8,15}$/.test(internationalNumber)) {
+          contactStatus.textContent = "Vérifie la date, l'heure, le lieu et l'activité avant de continuer.";
+          return;
+        }
+
+        currentDateDetails = details;
+        currentMessage = buildMessage(details);
+        document.getElementById("summary-date").textContent =
+          details.dateLabel;
+        document.getElementById("summary-time").textContent = details.time;
+        document.getElementById("summary-place").textContent = details.place;
+        document.getElementById("summary-activity").textContent = details.activity;
+        const messageItem = document.getElementById("summary-message-item");
+        messageItem.hidden = !message;
+        document.getElementById("summary-message").textContent = message;
+
+        whatsappLink.href = `https://wa.me/${internationalNumber}?text=${encodeURIComponent(currentMessage)}`;
+        messengerLink.href = messengerProfileUrl;
+        messengerFollowup.hidden = true;
+        copyFallback.hidden = true;
+        contactStatus.textContent = "";
+
+        showScreen("summary-screen");
+        makeHeartBurst();
+      });
+
+      messengerLink.addEventListener("click", (event) => {
+        if (!isValidDetails(currentDateDetails)) {
+          event.preventDefault();
+          contactStatus.textContent = "Confirme d'abord les détails du rendez-vous.";
+          return;
+        }
+
+        messengerFollowup.hidden = false;
+        contactStatus.textContent = "Le profil Facebook s'ouvre dans un nouvel onglet. Aucun message n'a été envoyé.";
+      });
+
+      document.getElementById("copy-message").addEventListener("click", copyDateMessage);
+      document.getElementById("select-manual-message").addEventListener("click", () => {
+        manualMessage.focus();
+        manualMessage.select();
+        contactStatus.textContent = "Message sélectionné. Copie-le, puis colle-le dans notre conversation Messenger.";
+      });
+
+      updateDateMinimum();
+    })();
+  </script>
+</body>
+</html>
